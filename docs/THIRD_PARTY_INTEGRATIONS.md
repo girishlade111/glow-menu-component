@@ -55,18 +55,17 @@ Every external service, platform, and library this project is wired into — wha
 
 ---
 
-## 3. Vercel Analytics — INSTALLED, NOT WIRED (action required if wanted)
+## 3. Vercel Analytics — REMOVED (was installed, never wired)
 
-**Status: the `@vercel/analytics@1.3.1` package is installed but never imported.** A `grep` across all source files finds zero references to `Analytics` or `@vercel/analytics`.
+**Status (2026-09-27 audit): the `@vercel/analytics` package was removed** via `pnpm remove @vercel/analytics`. It had been installed but never imported anywhere in the source — dead weight with no data collection happening.
 
-### What this means
+### To re-enable later
 
-- The dependency downloads and bundles nothing today — it's dead weight in `package.json`.
-- No page-view or Web-Vitals data is being collected, even on the Vercel deployment.
+```bash
+pnpm add @vercel/analytics
+```
 
-### To actually enable it
-
-In `app/layout.tsx`, add:
+Then in `app/layout.tsx`, add:
 
 ```tsx
 import { Analytics } from "@vercel/analytics/react";
@@ -75,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" disableSystemTheme>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           {children}
         </ThemeProvider>
         <Analytics />
@@ -85,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-No API key or env var is needed — `@vercel/analytics` auto-configures from the Vercel project. If you don't want analytics, remove the package (`pnpm remove @vercel/analytics`) instead of leaving it installed-but-dead.
+No API key or env var is needed — `@vercel/analytics` auto-configures from the Vercel project.
 
 ---
 
@@ -95,7 +94,7 @@ These are third-party libraries actively used by the source code:
 
 | Library | Version | Used in | Purpose |
 |---------|---------|---------|---------|
-| `framer-motion` | `latest` | `components/menu-bar.tsx` | All animation: 3D flip variants (`rotateX`), glow scale/spring, nav-bar radial glow. The entire menu interaction is Framer Motion variants + `whileHover`. |
+| `framer-motion` | `latest` (13.x at audit) | `components/menu-bar.tsx` | All animation: 3D flip variants (`rotateX`), glow scale/spring, nav-bar radial glow. Variant objects are typed as `Variants` (fixed in the 2026-09-27 audit). |
 | `next-themes` | `latest` | `components/theme-provider.tsx`, `components/theme-toggle.tsx`, `components/menu-bar.tsx` | Theme state (`useTheme`), `.dark` class management on `<html>`. `disableSystemTheme` is set, so the toggle is purely manual with `defaultTheme="light"`. |
 | `lucide-react` | `^0.454.0` | `menu-bar.tsx` (Home, Bell, Settings, User), `theme-toggle.tsx` (Sun, Moon) | Icon set. Tree-shaken per-icon imports. |
 | `@radix-ui/react-switch` (via shadcn) | `1.1.2` | `components/ui/switch.tsx` → `theme-toggle.tsx` | Accessible switch primitive behind the theme toggle. The other 23 `@radix-ui/*` packages are installed but unused by the current pages. |

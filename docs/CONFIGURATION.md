@@ -8,7 +8,7 @@ Every configuration file in this project, what it does, what each setting means,
 
 | Field | Value | Meaning |
 |-------|-------|---------|
-| `name` | `my-v0-project` | v0.app default name. Rename this if the repo is published as a package. |
+| `name` | `glow-menu-component` | Package name (renamed from v0 default `my-v0-project` during the 2026-09-27 audit). |
 | `version` | `0.1.0` | Semver. Manually bumped — nothing automates it here. |
 | `private` | `true` | Prevents accidental `npm publish`. Keep this `true`. |
 
@@ -23,7 +23,7 @@ Every configuration file in this project, what it does, what each setting means,
 
 ### Dependency Groups (abridged)
 
-- **Framework:** `next@15.2.4`, `react@19`, `react-dom@19`
+- **Framework:** `next@15.2.8`, `react@19`, `react-dom@19` (Next bumped from 15.2.4 in the 2026-09-27 audit — CVE-2025-55182/66478/55184/67779)
 - **UI primitives:** `@radix-ui/*` (24 packages — dialog, dropdown-menu, toast, tooltip, etc.), `shadcn` configured (see `components.json`)
 - **Animation:** `framer-motion@latest`, `embla-carousel-react`, `vaul`
 - **Theming:** `next-themes@latest`
@@ -31,8 +31,8 @@ Every configuration file in this project, what it does, what each setting means,
 - **Fonts:** `geist@^1.3.1` (plus Inter via `next/font/google` in `app/layout.tsx`)
 - **Forms/data:** `react-hook-form`, `@hookform/resolvers`, `zod`, `date-fns`, `input-otp`, `react-day-picker`, `cmdk`
 - **Styling:** `tailwindcss@^3.4.17`, `tailwindcss-animate`, `tailwind-merge`, `clsx`, `class-variance-authority`
-- **Analytics:** `@vercel/analytics@1.3.1` — **installed but not wired into any page** (see `docs/THIRD_PARTY_INTEGRATIONS.md`)
-- **Dev:** `typescript@^5`, `@types/*`, `postcss@^8.5`
+- **Analytics:** `@vercel/analytics` was removed in the 2026-09-27 audit (installed but never imported).
+- **Dev:** `typescript@^5`, `@types/*`, `postcss@^8.5`, `eslint@^9`, `eslint-config-next@15`, `@eslint/eslintrc` (ESLint flat config added in the 2026-09-27 audit)
 
 Package manager: **pnpm** (a `pnpm-lock.yaml` is committed; there is no `package-lock.json` or `yarn.lock`).
 
@@ -75,15 +75,9 @@ No `output: "export"` is set — this builds a standard Next.js app (server-rend
 - **`theme.extend.keyframes` / `animation`** — accordion open/close animations (used by Radix Accordion).
 - **Chart + sidebar tokens** — `--chart-1..5` and `--sidebar-*` variables are registered even though this demo doesn't render charts or a sidebar; harmless leftovers from the shadcn scaffold.
 
-### ⚠️ Important Tailwind limitation used in this codebase
+### Tailwind safelist (dynamic classes)
 
-`components/menu-bar.tsx` builds a class with a template literal:
-
-```tsx
-className={`... group-hover:${item.iconColor} ...`}
-```
-
-**Tailwind cannot see dynamically constructed class names.** `group-hover:text-blue-500` (and orange/green/red) are never generated into the CSS — the `group-hover:${...}` segment is dead code. The static `text-foreground` next to it is what actually renders. If per-item hover icon colors are wanted, add the four classes to Tailwind's `safelist` in `tailwind.config.ts`:
+`components/menu-bar.tsx` builds `group-hover:${item.iconColor}` via template literal, which Tailwind can't detect. The four resulting classes are safelisted in `tailwind.config.ts` so the per-item icon hover colors render (fixed in the 2026-09-27 audit, E2E-verified).
 
 ```ts
 safelist: [
@@ -93,8 +87,6 @@ safelist: [
   'group-hover:text-red-500',
 ],
 ```
-
-or map each item to a complete static class string.
 
 ---
 
@@ -162,7 +154,7 @@ Note: `strict: true` here is aspirational rather than enforced — `next.config.
 - **`style: default`, `baseColor: neutral`, `cssVariables: true`** — components are installed in the neutral palette using CSS variables (matching `styles/globals.css`).
 - **`rsc: true`** — installed components assume React Server Components compatibility.
 - **`iconLibrary: lucide`** — new components use Lucide icons.
-- **⚠️ Stale path:** `"css": "app/globals.css"` points to a file that **does not exist**. The real stylesheet is `styles/globals.css` (imported in `app/layout.tsx`). If you run `shadcn add`, update this path first or the CLI will create a duplicate `app/globals.css`.
+- **⚠️ Path fixed:** `"css"` was `"app/globals.css"` (a file that never existed); corrected to `"styles/globals.css"` in the 2026-09-27 audit.
 
 ---
 

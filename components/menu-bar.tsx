@@ -1,7 +1,7 @@
 "use client"
 
 import type * as React from "react"
-import { motion } from "framer-motion"
+import { motion, type Transition, type Variants } from "framer-motion"
 import { Home, Settings, Bell, User } from "lucide-react"
 import { useTheme } from "next-themes"
 
@@ -44,17 +44,17 @@ const menuItems: MenuItem[] = [
   },
 ]
 
-const itemVariants = {
+const itemVariants: Variants = {
   initial: { rotateX: 0, opacity: 1 },
   hover: { rotateX: -90, opacity: 0 },
 }
 
-const backVariants = {
+const backVariants: Variants = {
   initial: { rotateX: 90, opacity: 0 },
   hover: { rotateX: 0, opacity: 1 },
 }
 
-const glowVariants = {
+const glowVariants: Variants = {
   initial: { opacity: 0, scale: 0.8 },
   hover: {
     opacity: 1,
@@ -66,7 +66,7 @@ const glowVariants = {
   },
 }
 
-const navGlowVariants = {
+const navGlowVariants: Variants = {
   initial: { opacity: 0 },
   hover: {
     opacity: 1,
@@ -77,7 +77,7 @@ const navGlowVariants = {
   },
 }
 
-const sharedTransition = {
+const sharedTransition: Transition = {
   type: "spring",
   stiffness: 100,
   damping: 20,
@@ -104,7 +104,7 @@ export function MenuBar() {
         variants={navGlowVariants}
       />
       <ul className="flex items-center gap-2 relative z-10">
-        {menuItems.map((item, index) => (
+        {menuItems.map((item) => (
           <motion.li key={item.label} className="relative">
             <motion.div
               className="block rounded-xl overflow-visible group relative"
@@ -123,7 +123,7 @@ export function MenuBar() {
               />
               <motion.a
                 href={item.href}
-                className="flex items-center gap-2 px-4 py-2 relative z-10 bg-transparent text-muted-foreground group-hover:text-foreground transition-colors rounded-xl"
+                className="flex items-center gap-2 px-3 py-2 relative z-10 sm:px-4 bg-transparent text-muted-foreground group-hover:text-foreground transition-colors rounded-xl"
                 variants={itemVariants}
                 transition={sharedTransition}
                 style={{ transformStyle: "preserve-3d", transformOrigin: "center bottom" }}
@@ -131,11 +131,11 @@ export function MenuBar() {
                 <span className={`transition-colors duration-300 group-hover:${item.iconColor} text-foreground`}>
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </motion.a>
               <motion.a
                 href={item.href}
-                className="flex items-center gap-2 px-4 py-2 absolute inset-0 z-10 bg-transparent text-muted-foreground group-hover:text-foreground transition-colors rounded-xl"
+                className="flex items-center gap-2 px-3 py-2 absolute inset-0 z-10 sm:px-4 bg-transparent text-muted-foreground group-hover:text-foreground transition-colors rounded-xl"
                 variants={backVariants}
                 transition={sharedTransition}
                 style={{ transformStyle: "preserve-3d", transformOrigin: "center top", rotateX: 90 }}
@@ -143,7 +143,7 @@ export function MenuBar() {
                 <span className={`transition-colors duration-300 group-hover:${item.iconColor} text-foreground`}>
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                <span className="hidden sm:inline">{item.label}</span>
               </motion.a>
             </motion.div>
           </motion.li>

@@ -1,9 +1,19 @@
 import type { Config } from 'tailwindcss'
+import tailwindcssAnimate from 'tailwindcss-animate'
 
 // all in fixtures is set to tailwind v3 as interims solutions
 
 const config: Config = {
   darkMode: ['class'],
+  // Classes built dynamically in components/menu-bar.tsx via template literals
+  // (group-hover:${item.iconColor}) — Tailwind can't detect them, so they are
+  // safelisted here to make the per-item icon hover colors actually render.
+  safelist: [
+    'group-hover:text-blue-500',
+    'group-hover:text-orange-500',
+    'group-hover:text-green-500',
+    'group-hover:text-red-500',
+  ],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -93,6 +103,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [tailwindcssAnimate],
 }
 export default config

@@ -115,13 +115,13 @@ The trick: two absolutely-stacked `<motion.a>` elements with `transformStyle: "p
 
 `const { theme } = useTheme()` from `next-themes` switches the nav-glow opacity between dark (`/30`) and light (`/20`). The item gradients are theme-independent.
 
-### ⚠️ Known issue — dynamic Tailwind classes
+### ✅ Fixed: dynamic Tailwind classes (2026-09-27 audit)
 
 ```tsx
 className={`... group-hover:${item.iconColor} ...`}
 ```
 
-Tailwind compiles only class names it can find as literal strings. `group-hover:text-blue-500` built via template literal is **never generated**, so the icon-color-on-hover effect silently does nothing (the static `text-foreground` applies instead). To fix, add the four classes to `safelist` in `tailwind.config.ts` — see `docs/CONFIGURATION.md` §3.
+Tailwind compiles only class names it can find as literal strings. The four resulting classes (`group-hover:text-blue-500/orange-500/green-500/red-500`) are now safelisted in `tailwind.config.ts`, so the per-item icon hover colors render — E2E-verified.
 
 ---
 
@@ -164,9 +164,10 @@ Tune `sharedTransition` (spring stiffness/damping) for the flip speed, `glowVari
 
 ### Add a new shadcn component
 
-1. Fix the stale CSS path in `components.json` first: `"css": "app/globals.css"` → `"css": "styles/globals.css"` (the `app/globals.css` file doesn't exist).
-2. Run `pnpm dlx shadcn@latest add <component>` (e.g. `dialog`, `dropdown-menu` — their Radix packages are already installed).
-3. Import from `@/components/ui/<component>`.
+1. Run `pnpm dlx shadcn@latest add <component>` (e.g. `dialog`, `dropdown-menu` — their Radix packages are already installed).
+2. Import from `@/components/ui/<component>`.
+
+(The stale `css` path that used to break this was fixed in the 2026-09-27 audit.)
 
 ### Change the default theme
 
@@ -222,7 +223,7 @@ pnpm start   # serve it at http://localhost:3000
 | `pnpm dev` port conflict | Something already on :3000 | `pnpm dev -- -p 3001` |
 | Styles look unstyled | Tailwind `content` paths miss your file | File must be under `app/`, `components/`, `pages/`, or repo root |
 | Dark toggle does nothing | `.dark` class not applied | Check `ThemeProvider` wraps the app in `layout.tsx` with `attribute="class"` |
-| Icon hover color never changes | Dynamic Tailwind class (known issue §4) | Add classes to `safelist` in `tailwind.config.ts` |
-| `shadcn add` creates `app/globals.css` | Stale `css` path in `components.json` | Point it at `styles/globals.css` first |
+| Icon hover color never changes | Was a dynamic Tailwind class (fixed 2026-09-27 — safelisted in `tailwind.config.ts`) | — |
+| `shadcn add` creates `app/globals.css` | Was a stale `css` path in `components.json` (fixed 2026-09-27) | — |
 | Build passes but types are wrong | `ignoreBuildErrors: true` | Run `pnpm tsc --noEmit` manually to see real errors |
 | Hydration warning in console | Theme class mismatch SSR vs client | `suppressHydrationWarning` is already on `<html>`; expected and harmless |

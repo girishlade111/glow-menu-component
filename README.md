@@ -71,7 +71,7 @@ Then open [http://localhost:3000](http://localhost:3000). Hover any menu item to
 
 | Layer | Technology | Version | Role |
 |-------|-----------|---------|------|
-| Framework | Next.js (App Router) | 15.2.4 | Routing, SSR, build |
+| Framework | Next.js (App Router) | 15.2.8 | Routing, SSR, build |
 | UI library | React | 19 | Component model |
 | Language | TypeScript | 5 (strict) | Type safety |
 | Styling | Tailwind CSS | 3.4.17 | Utility-first CSS |
@@ -220,7 +220,7 @@ More recipes (new shadcn components, static export, OS-theme support) live in th
 |-------------|--------|
 | v0.app (generation + git sync) | ✅ Configured |
 | Vercel (hosting + deploys) | ✅ Configured |
-| Vercel Analytics | ⚠️ Installed but **not wired** — import `<Analytics />` in `layout.tsx` to enable, or `pnpm remove` it |
+| Vercel Analytics | ❌ Removed (was installed but never wired — see [audit](docs/AUDIT.md) §7) |
 | Framer Motion, next-themes, Lucide, Radix/shadcn | ✅ Used in code |
 
 Details, caveats, and the add-an-integration playbook: [docs/THIRD_PARTY_INTEGRATIONS.md](docs/THIRD_PARTY_INTEGRATIONS.md)
@@ -248,21 +248,24 @@ pnpm start    # serve production locally
 | [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Every config file, setting-by-setting, with verdicts |
 | [docs/THIRD_PARTY_INTEGRATIONS.md](docs/THIRD_PARTY_INTEGRATIONS.md) | v0, Vercel, Analytics, library inventory, integration playbook |
 | [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) | Setup, architecture, common tasks, theming flow, troubleshooting |
+| [docs/AUDIT.md](docs/AUDIT.md) | 2026-09-27 full audit: 10 findings fixed, 10/10 E2E results |
 
 ---
 
 ## Known Issues
 
-1. **Dynamic Tailwind class is dead code** — `group-hover:${item.iconColor}` in `menu-bar.tsx` is built via template literal, so Tailwind never generates those classes and the icon hover-color effect silently does nothing. Fix: add the four classes to `safelist` in `tailwind.config.ts` (see `docs/CONFIGURATION.md` §3).
-2. **`components.json` points at a missing CSS file** — `"css": "app/globals.css"` doesn't exist; the real file is `styles/globals.css`. Fix the path before running `shadcn add`.
-3. **Build ignores type/lint errors** — `next.config.mjs` silences both. Run `pnpm tsc --noEmit` manually to see real errors.
+All previously known issues were fixed in the [2026-09-27 audit](docs/AUDIT.md):
+
+1. ✅ **Dynamic Tailwind class** — `group-hover:${item.iconColor}` now works via `safelist` in `tailwind.config.ts` (E2E-verified: hovered icon renders `rgb(59,130,246)`).
+2. ✅ **`components.json` CSS path** — corrected to `styles/globals.css`.
+3. ⚠️ **Build ignores type/lint errors** — `next.config.mjs` still sets `ignoreDuringBuilds`/`ignoreBuildErrors` (v0 defaults). `tsc` and ESLint are clean today, so these can be removed to make CI fail loudly.
 
 ---
 
 ## Roadmap Ideas
 
-- [ ] Fix the dynamic-class issue and restore per-item icon hover colors
-- [ ] Wire up `@vercel/analytics` (or remove it)
+- [ ] ~~Fix the dynamic-class issue and restore per-item icon hover colors~~ ✅ fixed (2026-09-27 audit)
+- [ ] ~~Wire up `@vercel/analytics` (or remove it)~~ ✅ removed (2026-09-27 audit)
 - [ ] Active-route highlighting (`usePathname` → persistent glow on the current page)
 - [ ] Keyboard navigation + `aria-current` for a11y
 - [ ] Mobile variant (bottom tab bar with the same glow language)
