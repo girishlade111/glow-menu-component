@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export', // static export -> deployable to Cloudflare Pages / GitHub Pages
   eslint: {
     ignoreDuringBuilds: true,
   },

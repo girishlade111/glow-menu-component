@@ -229,14 +229,16 @@ Details, caveats, and the add-an-integration playbook: [docs/THIRD_PARTY_INTEGRA
 
 ## Build & Deployment
 
+**Live:** [https://glow-menu-component.pages.dev](https://glow-menu-component.pages.dev) (Cloudflare Pages)
+
 ```bash
-pnpm build    # → .next/
+pnpm build    # static export → out/
 pnpm start    # serve production locally
 ```
 
-**Vercel (recommended):** import the repo → accept the Next.js preset → deploy. Zero env vars needed; every push redeploys.
+The repo ships with `output: "export"` in `next.config.mjs`, so `pnpm build` emits a fully static site in `out/` — deployable to Cloudflare Pages, Netlify, or GitHub Pages as-is. Zero env vars needed.
 
-**Static hosting:** add `output: "export"` to `next.config.mjs`, rebuild, and host `out/` on Cloudflare Pages / Netlify / GitHub Pages (`images.unoptimized` is already set, as static export requires).
+**Vercel (alternative):** import the repo → accept the Next.js preset → deploy. (Static export also works on Vercel.)
 
 ---
 
